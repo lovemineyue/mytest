@@ -41,8 +41,6 @@ X , y = mnist_train[:9]
 show_fashion_mnist(X, get_fashion_mnist_labels(y))
 # plt.show()
 
-
-
 batch_size = 256
 transformer = gdata.vision.transforms.ToTensor()
 if sys.platform.startswith('win'):

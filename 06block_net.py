@@ -87,15 +87,15 @@ class NestNLP(nn.Block):
     #     return self.dense(self.net(x))
 
 
-# net = nn.Sequential()
-# net.add(NestNLP(), nn.Dense(20), FancyMLP())
-# net.initialize()
-#
-# print (net(X))
-
-
-net = NestNLP()
-net.add(nn.Dense(20))
+net = nn.Sequential()
+net.add(NestNLP(), nn.Dense(20), FancyMLP())
 net.initialize()
 
-print(net(X))
+print (net(X))
+
+
+# net = NestNLP()
+# net.add(nn.Dense(20))
+# net.initialize()
+#
+# print(net(X))

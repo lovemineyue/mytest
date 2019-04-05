@@ -77,7 +77,7 @@ for epoch in range(num_epoch):
         l.backward()
         sgd([w, b], lr, batch_size)
     train_l = loss(net(features, w, b), labels)
-    print('epoch %d, loss %f'%(epoch+1, train_l.mean().asnumpy()))
+    print('epoch %d, loss %f'%(epoch + 1, train_l.mean().asnumpy()))
 
 # x = list(range(len(train_l)))
 
