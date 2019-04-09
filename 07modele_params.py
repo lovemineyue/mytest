@@ -9,7 +9,7 @@ net.initialize()  # 使用默认初始化方式
 X = nd.random.uniform(shape=(2, 20))
 Y = net(X)  # 前向计算
 
-# print(net[0].params, type(net[0].params))
+print(net[0].params, type(net[0].params))
 
 
 # print(net[0].params['dense0_weight'], net[0].weight)
@@ -58,15 +58,15 @@ Y = net(X)  # 前向计算
 # print(b)
 
 # 4.2.4. 共享模型参数
-net = nn.Sequential()
-shared = nn.Dense(8, activation='relu')
-net.add(nn.Dense(8, activation='relu'),
-        shared,
-        nn.Dense(8, activation='relu', params=shared.params),
-        nn.Dense(10))
-net.initialize()
-
-X = nd.random.uniform(shape=(2, 20))
-net(X)
-
-print(net[1].weight.data()[0] == net[2].weight.data()[0])
+# net = nn.Sequential()
+# shared = nn.Dense(8, activation='relu')
+# net.add(nn.Dense(8, activation='relu'),
+#         shared,
+#         nn.Dense(8, activation='relu', params=shared.params),
+#         nn.Dense(10))
+# net.initialize()
+#
+# X = nd.random.uniform(shape=(2, 20))
+# net(X)
+#
+# print(net[1].weight.data()[0] == net[2].weight.data()[0])
