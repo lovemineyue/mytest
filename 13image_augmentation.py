@@ -132,7 +132,7 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
 
 
 def train_with_data_aug(train_augs, test_augs, lr=0.001):
-    batch_size, ctx, net = 256, try_all_gpus(), d2l.resnet18(10)
+    batch_size, ctx, net = 64, try_all_gpus(), d2l.resnet18(10)
     net.initialize(ctx=ctx, init=init.Xavier())
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
