@@ -40,10 +40,7 @@ X.norm().asscalar()
 A = nd.arange(3),reshape((3,1))
 B = nd.arange(2).reshape((1,2))
 
-
 A+B
-
-
 
 X[1:3]
 
@@ -80,4 +77,3 @@ P = np.ones((2,3))
 D = nd.array(P)
 
 D.asnumpy()
-
