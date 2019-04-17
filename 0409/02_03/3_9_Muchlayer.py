@@ -11,6 +11,9 @@ W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens))
 b1 = nd.zeros(num_hiddens)
 W2 = nd.random.normal(scale=0.01, shape=(num_hiddens, num_outputs))
 b2 = nd.zeros(num_outputs)
+
+
+
 params = [W1, b1, W2, b2]
 
 for param in params:
@@ -23,6 +26,7 @@ def relu(X):
 
 def net(X):
     X = X.reshape((-1, num_inputs))
+    # print(X.shape)
     H = relu(nd.dot(X, W1) + b1)
     return nd.dot(H, W2) + b2
 
