@@ -36,3 +36,82 @@ def lenet(X, params):
 
 # 交叉熵损失函数
 loss = gloss.SoftmaxCrossEntropyLoss()
+
+
+def get_params(params, ctx):
+    new_params = [p.copyto(ctx) for p in params]
+    for p in new_params:
+        p.attach_grad()
+    return new_params
+
+new_params = get_params(params, mx.gpu(0))
+print('b1 weight:', new_params[1])
+print('b1 grad:', new_params[1].grad)
+
+
+def allreduce(data):
+    for i in range(1, len(data)):
+        data[0][:] += data[i].copyto(data[0].context)
+    for i in range(1, len(data)):
+        data[0].copyto(data[i])
+
+
+data = [nd.ones((1, 2), ctx=mx.gpu(i)) * (i + 1) for i in range(2)]
+print('before allreduce:', data)
+allreduce(data)
+print('after allreduce:', data)
+
+def split_and_load(data, ctx):
+    n, k = data.shape[0], len(ctx)
+    m = n // k  # 简单起见，假设可以整除
+    assert m * k == n, '# examples is not divided by # devices.'
+    return [data[i * m: (i + 1) * m].as_in_context(ctx[i]) for i in range(k)]
+
+
+batch = nd.arange(24).reshape((6, 4))
+ctx = [mx.gpu(0), mx.gpu(1)]
+splitted = split_and_load(batch, ctx)
+print('input: ', batch)
+print('load into', ctx)
+print('output:', splitted)
+
+
+def train_batch(X, y, gpu_params, ctx, lr):
+    # 当ctx包含多块GPU及相应的显存时，将小批量数据样本划分并复制到各个显存上
+    gpu_Xs, gpu_ys = split_and_load(X, ctx), split_and_load(y, ctx)
+    with autograd.record():  # 在各块GPU上分别计算损失
+        ls = [loss(lenet(gpu_X, gpu_W), gpu_y)
+              for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
+    for l in ls:  # 在各块GPU上分别反向传播
+        l.backward()
+    # 把各块显卡的显存上的梯度加起来，然后广播到所有显存上
+    for i in range(len(gpu_params[0])):
+        allreduce([gpu_params[c][i].grad for c in range(len(ctx))])
+    for param in gpu_params:  # 在各块显卡的显存上分别更新模型参数
+        d2l.sgd(param, lr, X.shape[0])  # 这里使用了完整批量大小
+
+def train(num_gpus, batch_size, lr):
+    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+    ctx = [mx.gpu(i) for i in range(num_gpus)]
+    print('running on:', ctx)
+    # 将模型参数复制到num_gpus块显卡的显存上
+    gpu_params = [get_params(params, c) for c in ctx]
+    for epoch in range(4):
+        start = time.time()
+        for X, y in train_iter:
+            # 对单个小批量进行多GPU训练
+            train_batch(X, y, gpu_params, ctx, lr)
+            nd.waitall()
+        train_time = time.time() - start
+
+        def net(x):  # 在gpu(0)上验证模型
+            return lenet(x, gpu_params[0])
+
+        test_acc = d2l.evaluate_accuracy(test_iter, net, ctx[0])
+        print('epoch %d, time %.1f sec, test acc %.2f'
+              % (epoch + 1, train_time, test_acc))
+
+
+train(num_gpus=1, batch_size=256, lr=0.2)
+
+train(num_gpus=2, batch_size=256, lr=0.2)
