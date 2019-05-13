@@ -2,6 +2,8 @@ def log(func):
     print('aaa')
     def haha(*args, **kwargs):
         print("cccc")
+        kwargs["c"] = 130
+        # print(dict1)
         a = func(*args, **kwargs)
         print('ddddd')
         return a
@@ -12,8 +14,11 @@ def log(func):
 
 @log
 def test():
+    # print(kwargs)
     print('wo in China')
 
+
+dict1 = {"a":110,"b":120}
 test()
 
 
