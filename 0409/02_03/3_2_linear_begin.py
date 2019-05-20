@@ -61,8 +61,8 @@ for epoch in range(num_epochs):
     for X, y in iters(batch_size, features, labels):
         with autograd.record():
             l = loss(net(X, w ,b), y)
-    l.backward()
-    sgd([w,b],lr,batch_size)
+        l.backward()
+        sgd([w,b],lr,batch_size)
 
     train_l = loss(net(features,w,b),labels)
 
