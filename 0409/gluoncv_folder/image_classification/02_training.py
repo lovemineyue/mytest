@@ -91,3 +91,55 @@ def test(ctx, val_data):
         outputs = [net(X) for X in data]
         metric.update(label, outputs)
     return metric.get()
+
+epochs = 3
+lr_decay_count = 0
+
+for epoch in range(epochs):
+    tic = time.time()
+    train_metric.reset()
+    train_loss = 0
+
+    # Learning rate decay
+    if epoch == lr_decay_epoch[lr_decay_count]:
+        trainer.set_learning_rate(trainer.learning_rate*lr_decay)
+        lr_decay_count += 1
+
+    # Loop through each batch of training data
+    for i, batch in enumerate(train_data):
+        # Extract data and label
+        data = gluon.utils.split_and_load(batch[0], ctx_list=ctx, batch_axis=0)
+        label = gluon.utils.split_and_load(batch[1], ctx_list=ctx, batch_axis=0)
+
+        # AutoGrad
+        with ag.record():
+            output = [net(X) for X in data]
+            loss = [loss_fn(yhat, y) for yhat, y in zip(output, label)]
+
+        # Backpropagation
+        for l in loss:
+            l.backward()
+
+        # Optimize
+        trainer.step(batch_size)
+
+        # Update metrics
+        train_loss += sum([l.sum().asscalar() for l in loss])
+        train_metric.update(label, output)
+
+    name, acc = train_metric.get()
+    # Evaluate on Validation data
+    name, val_acc = test(ctx, val_data)
+
+    # Update history and print metrics
+    train_history.update([1-acc, 1-val_acc])
+    print('[Epoch %d] train=%f val=%f loss=%f time: %f' %
+        (epoch, acc, val_acc, train_loss, time.time()-tic))
+
+# We can plot the metric scores with:
+
+train_history.plot()
+
+
+# net.save_parameters('dive_deep_cifar10_resnet20_v2.params')
+# net.load_parameters('dive_deep_cifar10_resnet20_v2.params', ctx=ctx)
