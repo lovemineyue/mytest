@@ -22,9 +22,9 @@ def data_batch():
     indices = list(range(num))
     random.shuffle(indices)
     # print(datalist[0:10])
-    for i in range(0, num, batch_size):
+    for i in range(0, num_examples, batch_size):
 
-        j = nd.array(indices[i:min(i+batch_size,num_examples)])
+        j = nd.array(indices[i:min(i+batch_size, num_examples)])
         yield features.take(j), labels.take(j)
 
 
