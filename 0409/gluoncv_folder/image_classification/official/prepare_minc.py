@@ -47,6 +47,7 @@ for l in labels:
     makedirs(os.path.join(test_path, l))
 
 # Copy files to corresponding directory
+
 for im in train_images:
     im_path = im.replace('images/', '').strip('\n')
     shutil.copy(os.path.join(src_path, im_path),
