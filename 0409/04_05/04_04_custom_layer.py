@@ -26,7 +26,7 @@ class CenteredLayer(nn.Block):
 params = gluon.ParameterDict()
 params.get('param2',shape=(2,3))
 
-# print(params)
+print(params)
 
 
 
@@ -55,4 +55,4 @@ net.add(MyDense(8, in_units=64),
         MyDense(1, in_units=8))
 net.initialize()
 Y = net(nd.random.uniform(shape=(2, 64)))
-print(Y)
+# print(Y)

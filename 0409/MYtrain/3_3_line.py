@@ -30,6 +30,7 @@ net.initialize(init.Normal(0.01))
 
 from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()
+# gloss.TripletLoss
 
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate':0.03})

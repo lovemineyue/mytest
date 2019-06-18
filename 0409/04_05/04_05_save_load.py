@@ -4,9 +4,9 @@ from mxnet.gluon import nn
 x = nd.ones(3)
 # savePath = "./saveFolder"
 
-# nd.save('x', x)
-# x2 = nd.load('x')
-# print(x2)
+nd.save('x', x)
+x2 = nd.load('x')
+print(x2)
 
 y = nd.zeros(4)
 # nd.save("xy", [x, y])
